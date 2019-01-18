@@ -1,5 +1,4 @@
 #include "spell_checker.h"
-#include <iostream>
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -7,7 +6,6 @@
 #include <unordered_set>
 #include <fstream>
 #include <exception>
-#include <regex>
 
 namespace {
 	std::string string_to_lower(std::string str) {
@@ -61,11 +59,24 @@ bool SpellChecker_Container<Container, T...>::check(const std::string &word) con
 template <>
 bool SpellChecker_Container<std::vector, std::string>::check(const std::string &word) const {
  	return std::binary_search(std::begin(storage_), std::end(storage_), string_to_lower(word));
- }
+}
+
+template<template <typename... Args> class Container, typename... T>
+void SpellChecker_Container<Container, T...>::add(const std::string& word) {
+	if (!check(word)) {
+		storage_.insert(word);
+	}
+}
+
+template<>
+void SpellChecker_Container<std::vector, std::string>::add(const std::string& word) {
+	if (!SpellChecker_Container<std::vector, std::string>::check(word)) {
+    	storage_.insert(std::upper_bound(storage_.begin(), storage_.end(), word), word);
+    }
+}
 
 SpellChecker::SpellChecker(const ContainerType type) 
 {
-	//std::cout << "CONTEINER ENUM " << ContainerType::Vector << std::endl;
 	if (type == ContainerType::Vector) {
 		impl_ = std::make_unique<SpellChecker_Container<std::vector, std::string>>();
 	}
@@ -85,21 +96,27 @@ bool SpellChecker::check(const std::string &word) const {
 	return impl_->check(word);
 }
 
+void SpellChecker::add(const std::string& word) {
+	impl_->add(word);
+}
+
 size_t SpellChecker::size(void) const {
 	return impl_->size();
 }
 
-bool SpellChecker::is_valid(const std::string &word) {;
-	const std::regex regex_cond("[a-zA-Z']*");
- 	if (word.size() > 45 || !std::regex_match(word.begin(), word.end(), regex_cond)) {
+bool SpellChecker::is_valid(const std::string &word) {
+ 	if (word.size() > 45) {
  		return false;
  	}
  	if (*word.begin() == '\'') {
  		return false;
  	}
+ 	for (auto it : word) {
+ 		if (!std::isalpha(it)) {
+ 			if (it != '\'') {
+ 				return false;
+ 			}
+ 		}
+ 	}
 	return true;
 }
-
-
-
-

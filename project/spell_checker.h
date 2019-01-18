@@ -12,6 +12,7 @@ class SpellChecker_Impl
 public:
    virtual void load (const std::string& dictionary) = 0;
    virtual bool check (const std::string& word) const = 0;
+   virtual void add (const std::string& word) = 0;
    virtual size_t size(void) const = 0;
    virtual ~SpellChecker_Impl() {}
 };
@@ -23,6 +24,7 @@ public:
    SpellChecker_Container();
    void load(const std::string &dictionary) override;
    bool check (const std::string &word) const override;
+   void add (const std::string& word) override;
    size_t size(void) const override;
 
 private:
@@ -42,6 +44,9 @@ public:
  
    // returns true if word is in dictionary else false.
    bool check(const std::string& word) const;
+
+   // adds word to dictionary in-memory
+   void add(const std::string& word);
 
    // Returns number of words in dictionary if loaded else 0 if not yet loaded.
    size_t size(void) const;
