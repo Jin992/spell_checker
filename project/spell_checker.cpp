@@ -9,15 +9,10 @@
 
 namespace {
 	std::string string_to_lower(std::string str) {
-    	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    	return str;
+		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		return str;
 	}
 }
-
-template<template <typename... Args> class Container, typename... T>
-SpellChecker_Container<Container, T...>::SpellChecker_Container()
-: dict_size_(0)
-{}
 
 template<template <typename... Args> class Container, typename... T>
 void SpellChecker_Container<Container, T...>::load(const std::string &dictionary) {
@@ -50,15 +45,15 @@ size_t SpellChecker_Container<Container, T...>::size(void) const {
 
 template<template <typename... Args> class Container, typename... T>
 bool SpellChecker_Container<Container, T...>::check(const std::string &word) const {
- 	if (storage_.find(string_to_lower(word)) == storage_.end()) {
- 		return false;
- 	}
- 	return true;
- }
+	if (storage_.find(string_to_lower(word)) == storage_.end()) {
+		return false;
+	}
+	return true;
+}
 
 template <>
 bool SpellChecker_Container<std::vector, std::string>::check(const std::string &word) const {
- 	return std::binary_search(std::begin(storage_), std::end(storage_), string_to_lower(word));
+	return std::binary_search(std::begin(storage_), std::end(storage_), string_to_lower(word));
 }
 
 template<template <typename... Args> class Container, typename... T>
@@ -71,8 +66,8 @@ void SpellChecker_Container<Container, T...>::add(const std::string& word) {
 template<>
 void SpellChecker_Container<std::vector, std::string>::add(const std::string& word) {
 	if (!SpellChecker_Container<std::vector, std::string>::check(word)) {
-    	storage_.insert(std::upper_bound(storage_.begin(), storage_.end(), word), word);
-    }
+		storage_.insert(std::upper_bound(storage_.begin(), storage_.end(), word), word);
+	}
 }
 
 SpellChecker::SpellChecker(const ContainerType type) 
@@ -105,18 +100,18 @@ size_t SpellChecker::size(void) const {
 }
 
 bool SpellChecker::is_valid(const std::string &word) {
- 	if (word.size() > 45) {
- 		return false;
- 	}
- 	if (*word.begin() == '\'') {
- 		return false;
- 	}
- 	for (auto it : word) {
- 		if (!std::isalpha(it)) {
- 			if (it != '\'') {
- 				return false;
- 			}
- 		}
- 	}
+	if (word.size() > 45) {
+		return false;
+	}
+	if (*word.begin() == '\'') {
+		return false;
+	}
+	for (auto it : word) {
+		if (!std::isalpha(it)) {
+			if (it != '\'') {
+				return false;
+			}
+		}
+	}
 	return true;
 }
