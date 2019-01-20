@@ -70,8 +70,7 @@ void SpellChecker_Container<std::vector, std::string>::add(const std::string& wo
 	}
 }
 
-SpellChecker::SpellChecker(const ContainerType type) 
-{
+SpellChecker::SpellChecker(const ContainerType type) {
 	if (type == ContainerType::Vector) {
 		impl_ = std::make_unique<SpellChecker_Container<std::vector, std::string>>();
 	}
@@ -100,17 +99,12 @@ size_t SpellChecker::size(void) const {
 }
 
 bool SpellChecker::is_valid(const std::string &word) {
-	if (word.size() > 45) {
-		return false;
-	}
-	if (*word.begin() == '\'') {
+	if (word.size() > 45 || *word.begin() == '\'') {
 		return false;
 	}
 	for (auto it : word) {
-		if (!std::isalpha(it)) {
-			if (it != '\'') {
+		if (!std::isalpha(it) && it != '\'') {
 				return false;
-			}
 		}
 	}
 	return true;
