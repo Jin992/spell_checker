@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+enum class ContainerType { Vector, Set, Unordered_Set };
+
 // exception on failure to load dictionary file
 class SpellChecker_InvalidDictFile {} ;
 
@@ -16,21 +18,6 @@ public:
 	virtual size_t size(void) const = 0;
 	virtual ~SpellChecker_Impl() {}
 };
-
-template<template <typename... Args> class Container, typename... T>
-class SpellChecker_Container : public SpellChecker_Impl
-{
-public:
-	void load(const std::string &) override;
-	bool check (const std::string &) const override;
-	void add (const std::string &) override;
-	size_t size(void) const override;
-
-private:
-	Container<T...> storage_;
-};
-
-enum class ContainerType { Vector, Set, Unordered_Set };
 
 class SpellChecker
 {
@@ -55,4 +42,3 @@ public:
 private:
 	std::unique_ptr<SpellChecker_Impl> impl_;
 };
-

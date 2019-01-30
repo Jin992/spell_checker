@@ -14,8 +14,21 @@ namespace {
 	}
 }
 
-template<template <typename... Args> class Container, typename... T>
-void SpellChecker_Container<Container, T...>::load(const std::string &dictionary) {
+template<template <typename... Args> class Container>
+class SpellChecker_Container : public SpellChecker_Impl
+{
+public:
+	void load(const std::string &) override;
+	bool check (const std::string &) const override;
+	void add (const std::string &) override;
+	size_t size(void) const override;
+
+private:
+	Container<std::string> storage_;
+};
+
+template<template <typename... Args> class Container>
+void SpellChecker_Container<Container>::load(const std::string &dictionary) {
 	std::ifstream file;
 	file.open(dictionary);
 	if (!file.is_open()) {
@@ -27,7 +40,7 @@ void SpellChecker_Container<Container, T...>::load(const std::string &dictionary
 }
 
 template<>
-void SpellChecker_Container<std::vector, std::string>::load(const std::string &dictionary) {
+void SpellChecker_Container<std::vector>::load(const std::string &dictionary) {
 	std::ifstream file;
 	file.open(dictionary);
 	if (!file.is_open()) {
@@ -38,13 +51,13 @@ void SpellChecker_Container<std::vector, std::string>::load(const std::string &d
 	file.close();
 }
 
-template<template <typename... Args> class Container, typename... T>
-size_t SpellChecker_Container<Container, T...>::size(void) const {
+template<template <typename... Args> class Container>
+size_t SpellChecker_Container<Container>::size(void) const {
 	  return storage_.size();
 }
 
-template<template <typename... Args> class Container, typename... T>
-bool SpellChecker_Container<Container, T...>::check(const std::string &word) const {
+template<template <typename... Args> class Container>
+bool SpellChecker_Container<Container>::check(const std::string &word) const {
 	if (storage_.find(string_to_lower(word)) == storage_.end()) {
 		return false;
 	}
@@ -52,33 +65,37 @@ bool SpellChecker_Container<Container, T...>::check(const std::string &word) con
 }
 
 template <>
-bool SpellChecker_Container<std::vector, std::string>::check(const std::string &word) const {
+bool SpellChecker_Container<std::vector>::check(const std::string &word) const {
 	return std::binary_search(std::begin(storage_), std::end(storage_), string_to_lower(word));
 }
 
-template<template <typename... Args> class Container, typename... T>
-void SpellChecker_Container<Container, T...>::add(const std::string& word) {
+template<template <typename... Args> class Container>
+void SpellChecker_Container<Container>::add(const std::string& word) {
 	if (!check(word)) {
 		storage_.insert(word);
 	}
 }
 
 template<>
-void SpellChecker_Container<std::vector, std::string>::add(const std::string& word) {
-	if (!SpellChecker_Container<std::vector, std::string>::check(word)) {
+void SpellChecker_Container<std::vector>::add(const std::string& word) {
+	if (!SpellChecker_Container<std::vector>::check(word)) {
 		storage_.insert(std::upper_bound(storage_.begin(), storage_.end(), word), word);
 	}
 }
 
+
 SpellChecker::SpellChecker(const ContainerType type) {
 	if (type == ContainerType::Vector) {
-		impl_ = std::make_unique<SpellChecker_Container<std::vector, std::string>>();
+		impl_ = std::make_unique<SpellChecker_Container<std::vector>>();
 	}
 	else if (type == ContainerType::Set) {
-		impl_ = std::make_unique<SpellChecker_Container<std::set, std::string>>();
+		impl_ = std::make_unique<SpellChecker_Container<std::set>>();
 	}
 	else if (type == ContainerType::Unordered_Set) {
-		impl_ = std::make_unique<SpellChecker_Container<std::unordered_set, std::string>>();
+		impl_ = std::make_unique<SpellChecker_Container<std::unordered_set>>();
+	}
+	else {
+		impl_ = nullptr;
 	}
 }
 

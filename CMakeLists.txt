@@ -17,13 +17,14 @@ target_include_directories(spell_checker_gTest PUBLIC
 set_target_properties(spell_checker_gTest PROPERTIES
     CXX_STANDARD 14
 )
+set(ENV{GTEST_DIR} "../googletest/googletest")
 
 target_sources(spell_checker_gTest PRIVATE
-    ../googletest/googletest/src/gtest-all.cc
+    $ENV{GTEST_DIR}/src/gtest-all.cc
 )
 target_include_directories(spell_checker_gTest PRIVATE
-    ../googletest/googletest
-    ../googletest/googletest/include
+    $ENV{GTEST_DIR}
+    $ENV{GTEST_DIR}/include
 )
 target_link_libraries(spell_checker_gTest
     pthread
